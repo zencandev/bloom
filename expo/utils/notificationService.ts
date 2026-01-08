@@ -70,11 +70,10 @@ export async function scheduleDailyNudges(hasClipToday: boolean) {
             channelId: 'zensnap-reminders',
         },
         trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
             hour: 9,
             minute: 0,
             repeats: true,
-        },
+        } as any,
     });
 
     // Schedule 6:00 PM nudge
@@ -86,11 +85,10 @@ export async function scheduleDailyNudges(hasClipToday: boolean) {
             channelId: 'zensnap-reminders',
         },
         trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
             hour: 18,
             minute: 0,
             repeats: true,
-        },
+        } as any,
     });
 
     console.log('ZenSnap: Reminders scheduled for 9 AM and 6 PM.');
