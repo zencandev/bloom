@@ -151,10 +151,12 @@ export default function HomeScreen() {
         if (clip) {
             // View existing clip
             router.push(`/preview/${dayIndex}`);
+        } else if (dayIndex === todayIndex) {
+            // Only allow recording for today
+            router.push('/breathe');
         } else {
-            // DEV MODE: Allow recording for any day (not just today)
-            // In production, this would be: else if (dayIndex === todayIndex)
-            router.push({ pathname: '/breathe', params: { testDay: dayIndex.toString() } });
+            // Inform user it's not the right day
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
         }
     };
 
@@ -276,6 +278,20 @@ export default function HomeScreen() {
                     </Pressable>
                 </Animated.View>
             )}
+
+            {/* History Button */}
+            <Animated.View
+                entering={FadeIn.delay(1100).duration(600)}
+                style={styles.historyContainer}
+            >
+                <Pressable
+                    style={styles.historyButton}
+                    onPress={() => router.push('/history')}
+                >
+                    <Text style={styles.historyIcon}>🕒</Text>
+                    <Text style={styles.historyText}>History</Text>
+                </Pressable>
+            </Animated.View>
         </SafeAreaView>
     );
 }
@@ -422,5 +438,31 @@ const styles = StyleSheet.create({
         fontSize: Typography.sizes.base,
         color: Colors.sage,
         letterSpacing: Typography.letterSpacing.wide,
+    },
+    historyContainer: {
+        position: 'absolute',
+        bottom: Spacing.xl,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+    },
+    historyButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: Spacing.sm,
+        paddingHorizontal: Spacing.lg,
+        backgroundColor: Colors.surface,
+        borderRadius: BorderRadius.full,
+        opacity: 0.8,
+    },
+    historyIcon: {
+        fontSize: 14,
+        marginRight: Spacing.xs,
+    },
+    historyText: {
+        fontSize: Typography.sizes.xs,
+        color: Colors.textMuted,
+        textTransform: 'uppercase',
+        letterSpacing: Typography.letterSpacing.widest,
     },
 });

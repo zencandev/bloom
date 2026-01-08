@@ -6,7 +6,7 @@ import {
     Pressable,
     Dimensions,
 } from 'react-native';
-import { router } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import * as Haptics from 'expo-haptics';
@@ -17,10 +17,15 @@ import { Colors, Typography, Spacing, BorderRadius } from '../constants/theme';
 const { width, height } = Dimensions.get('window');
 
 export default function PlayerScreen() {
+    const { videoUri, title } = useLocalSearchParams<{ videoUri?: string; title?: string }>();
     const currentWeek = useZenStore((state) => state.currentWeek);
 
+    // Dynamic resolution of video URI
+    const uriToPlay = videoUri || currentWeek?.weeklyZenUri || null;
+    const weekTitle = title || currentWeek?.weekId || 'Weekly Zen';
+
     // Create video player with the new expo-video API
-    const player = useVideoPlayer(currentWeek?.weeklyZenUri || null, player => {
+    const player = useVideoPlayer(uriToPlay, player => {
         player.loop = true;
         player.play();
     });
@@ -74,8 +79,8 @@ export default function PlayerScreen() {
                     entering={FadeIn.delay(700).duration(400)}
                     style={styles.bottomContainer}
                 >
-                    <Text style={styles.title}>Weekly Zen</Text>
-                    <Text style={styles.subtitle}>{currentWeek.weekId}</Text>
+                    <Text style={styles.title}>{weekTitle}</Text>
+                    <Text style={styles.subtitle}>Presence Captured</Text>
 
                     <Pressable style={styles.replayButton} onPress={handleReplay}>
                         <Text style={styles.replayButtonText}>↻ Replay</Text>

@@ -81,12 +81,9 @@ export async function stitchVideos(options: StitchOptions): Promise<StitchResult
             return { uri, duration };
         }));
 
+        // Log detected durations for debugging
         const totalDuration = clipsMetadata.reduce((acc, clip) => acc + clip.duration, 0);
         const totalSlowDuration = totalDuration * 2.0;
-
-        // Log detected durations for debugging
-        console.log('Detected Clip Durations:', clipsMetadata.map(c => `${c.uri.split('/').pop()}: ${c.duration}s`));
-        console.log('Total Output Duration (Slow-Mo):', totalSlowDuration);
 
         // Enable progress callback with accurate duration
         if (onProgress) {
@@ -99,7 +96,6 @@ export async function stitchVideos(options: StitchOptions): Promise<StitchResult
 
         // Build the FFmpeg command
         const command = buildFFmpegCommand(clipsMetadata, outputUri, audioUri);
-        console.log('FFmpeg command:', command);
 
         // Execute
         const session = await FFmpegKit.execute(command);

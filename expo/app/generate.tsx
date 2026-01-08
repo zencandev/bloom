@@ -43,6 +43,12 @@ export default function GenerateScreen() {
     const pulseScale = useSharedValue(1);
 
     useEffect(() => {
+        // Auto-switch to complete if video already exists
+        if (currentWeek?.weeklyZenUri) {
+            setGeneratedUri(currentWeek.weeklyZenUri);
+            setState('complete');
+        }
+
         pulseScale.value = withRepeat(
             withSequence(
                 withTiming(1.05, { duration: 1000 }),
@@ -51,7 +57,7 @@ export default function GenerateScreen() {
             -1,
             true
         );
-    }, []);
+    }, [currentWeek?.weeklyZenUri]);
 
     const pulseStyle = useAnimatedStyle(() => ({
         transform: [{ scale: pulseScale.value }],
@@ -119,7 +125,6 @@ export default function GenerateScreen() {
             }
 
         } catch (error) {
-            console.error('Generation error:', error);
             setState('error');
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         }
@@ -157,6 +162,12 @@ export default function GenerateScreen() {
         router.back();
     };
 
+    const getWeekLabel = () => {
+        if (!currentWeek) return '';
+        const weekNum = currentWeek.weekId.split('-W')[1];
+        return `Week ${parseInt(weekNum)} Zen`;
+    };
+
     const clips = currentWeek?.clips || [];
     const sortedClips = [...clips].sort((a, b) => a.dayIndex - b.dayIndex);
 
@@ -180,8 +191,8 @@ export default function GenerateScreen() {
                             entering={FadeIn.duration(500)}
                             style={styles.previewContainer}
                         >
-                            <Text style={styles.previewTitle}>Your Week</Text>
-                            <Text style={styles.previewSubtitle}>{currentWeek?.weekId}</Text>
+                            <Text style={styles.previewTitle}>Ready for your film?</Text>
+                            <Text style={styles.previewSubtitle}>{getWeekLabel()}</Text>
 
                             {/* Clips preview */}
                             <View style={styles.clipsGrid}>
@@ -234,9 +245,9 @@ export default function GenerateScreen() {
                         style={styles.completeContainer}
                     >
                         <Text style={styles.completeEmoji}>✨</Text>
-                        <Text style={styles.completeTitle}>Your Weekly Zen is Ready</Text>
+                        <Text style={styles.completeTitle}>{getWeekLabel()}</Text>
                         <Text style={styles.completeSubtitle}>
-                            A 10.5-second film of your week
+                            Your 21-second film of peace
                         </Text>
 
                         <View style={styles.actionButtons}>
