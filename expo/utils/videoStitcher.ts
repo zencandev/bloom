@@ -139,34 +139,20 @@ function buildFFmpegCommand(clips: { uri: string, duration: number }[], outputUr
     const n = clips.length;
 
     for (let i = 0; i < n; i++) {
-        // Video: Normalize + Lo-Fi (Saturation/Contrast)
+        // Video: Normalize ONLY (Golden State - Verified Working)
         // fps=30, scale=1080:1920, setsar=1, format=yuv420p
-        // eq=saturation=0.7:contrast=1.2 (Vintage Look)
-        filterComplex += `[${i}:v]fps=30,scale=1080:1920,setsar=1,format=yuv420p,eq=saturation=0.7:contrast=1.2[v${i}]; `;
+        filterComplex += `[${i}:v]fps=30,scale=1080:1920,setsar=1,format=yuv420p[v${i}]; `;
         videoNodes += `[v${i}]`;
-
-        // Note: Clip audio is intentionally ignored as per user request to avoid crashes
-        // and because they will add their own Lo-Fi background track.
     }
 
     // Simple Concat
-    filterComplex += `${videoNodes}concat=n=${n}:v=1:a=0[catv]; `;
-
-    // Global Effects: Film Grain on final output
-    filterComplex += `[catv]noise=alls=10:allf=t+u[outv]`;
+    filterComplex += `${videoNodes}concat=n=${n}:v=1:a=0[outv]; `;
 
     // Command structure:
-    // -i clip1 -i clip2 ... [audioInput]
-    // Map [outv] (Video)
-    // If audioUri exists, map existing audio input directly (no complex mix needed if it's the only audio)
-
     let command = `${inputs} ${audioInput} -filter_complex "${filterComplex}" -map "[outv]"`;
 
     if (audioUri) {
         // Map the extra audio input (index n)
-        // -shortest ensure video doesn't run forever if audio is long? 
-        // Or -t videoDuration?
-        // Let's use -c:a aac -b:a 128k
         command += ` -map ${n}:a -c:a aac -b:a 128k -shortest`;
     } else {
         command += ` -an`;
