@@ -19,6 +19,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useZenStore, getDayIndex } from '../stores/zenStore';
 import { Colors, Typography, Spacing, BorderRadius, AppConstants } from '../constants/theme';
+import { scheduleDailyNudges } from '../utils/notificationService';
 
 const { width, height } = Dimensions.get('window');
 const CAPTURE_DURATION = AppConstants.CAPTURE_DURATION_MS;
@@ -165,6 +166,9 @@ export default function CaptureScreen() {
                 videoUri: newUri,
                 createdAt: timestamp,
             });
+
+            // Update notifications (silence for today)
+            scheduleDailyNudges(true);
 
             setIsComplete(true);
 

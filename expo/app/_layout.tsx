@@ -5,12 +5,24 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
 import { useZenStore } from '../stores/zenStore';
 import { Colors } from '../constants/theme';
+import { requestNotificationPermissions, scheduleDailyNudges } from '../utils/notificationService';
 
 export default function RootLayout() {
     const initializeWeek = useZenStore((state) => state.initializeWeek);
 
     useEffect(() => {
         initializeWeek();
+
+        // Setup notifications
+        const setupNotifications = async () => {
+            const granted = await requestNotificationPermissions();
+            if (granted) {
+                const hasClipToday = !!useZenStore.getState().getTodayClip();
+                await scheduleDailyNudges(hasClipToday);
+            }
+        };
+
+        setupNotifications();
     }, []);
 
     return (
