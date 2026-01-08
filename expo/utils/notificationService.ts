@@ -66,13 +66,18 @@ export async function scheduleDailyNudges(hasClipToday: boolean) {
         content: {
             title: "Morning Zen ☀️",
             body: getRandomMessage(),
-            // @ts-ignore: channelId is supported on Android
+            // Double-register for safety across different SDK 54 patch versions
+            // @ts-ignore
             channelId: 'zensnap-reminders',
+            ...Platform.select({
+                android: { channelId: 'zensnap-reminders' },
+                default: {},
+            }) as any,
         },
         trigger: {
+            type: 'daily',
             hour: 9,
             minute: 0,
-            repeats: true,
         } as any,
     });
 
@@ -81,13 +86,17 @@ export async function scheduleDailyNudges(hasClipToday: boolean) {
         content: {
             title: "Evening Stillness 🌙",
             body: getRandomMessage(),
-            // @ts-ignore: channelId is supported on Android
+            // @ts-ignore
             channelId: 'zensnap-reminders',
+            ...Platform.select({
+                android: { channelId: 'zensnap-reminders' },
+                default: {},
+            }) as any,
         },
         trigger: {
+            type: 'daily',
             hour: 18,
             minute: 0,
-            repeats: true,
         } as any,
     });
 
