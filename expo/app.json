@@ -13,6 +13,10 @@
       "resizeMode": "contain",
       "backgroundColor": "#1A1A1A"
     },
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#A8B5A0"
+    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.zensnap.app",
@@ -35,10 +39,6 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
       ],
-      "notification": {
-        "icon": "./assets/notification-icon.png",
-        "color": "#A8B5A0"
-      },
       "edgeToEdgeEnabled": true
     },
     "plugins": [
