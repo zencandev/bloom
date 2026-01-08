@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as MediaLibrary from 'expo-media-library';
 import * as Haptics from 'expo-haptics';
+import { Asset } from 'expo-asset';
 import Animated, {
     FadeIn,
     FadeInUp,
@@ -85,14 +86,15 @@ export default function GenerateScreen() {
             let result: StitchResult;
 
             if (ffmpegAvailable) {
-                // Use FFmpeg with crossfade transitions
-                // Note: Audio asset would be added here in production
-                // const audioUri = Asset.fromModule(require('../assets/audio/zen_ambient.mp3')).uri;
+                // Use FFmpeg with Lo-Fi filters
+                const audioAsset = Asset.fromModule(require('../assets/audio/zen-music-yoga.mp3'));
+                await audioAsset.downloadAsync();
+                const audioUri = audioAsset.localUri || audioAsset.uri;
 
                 result = await stitchVideos({
                     clipUris,
                     outputUri,
-                    // audioUri, // Uncomment when audio asset is added
+                    audioUri,
                     onProgress: (progress) => {
                         setProgress(Math.floor(progress * 100));
                     },

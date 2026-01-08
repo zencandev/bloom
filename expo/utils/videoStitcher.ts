@@ -62,20 +62,12 @@ export async function stitchVideos(options: StitchOptions): Promise<StitchResult
         }
     }
 
+    if (onProgress) {
+        onProgress(0.1);
+    }
+
     try {
         // Enable progress callback
-        if (onProgress) {
-            FFmpegKitConfig.enableStatisticsCallback((stats) => {
-                const time = stats.getTime();
-                // Estimate total duration: clips + transitions
-                const totalDuration = (clipUris.length * CLIP_DURATION) - ((clipUris.length - 1) * CROSSFADE_DURATION);
-                const progress = Math.min((time / 1000) / totalDuration, 1);
-                onProgress(progress);
-            });
-        }
-
-        // Detect actual clip durations to ensure xfade offsets are correct
-        // Hardcoded 1.5s fails if clips are shorter (e.g. 1.0s)
         const clipsMetadata = await Promise.all(clipUris.map(async (uri) => {
             const session = await FFprobeKit.getMediaInformation(uri);
             const info = session.getMediaInformation();
@@ -83,7 +75,6 @@ export async function stitchVideos(options: StitchOptions): Promise<StitchResult
             let duration = 1.5;
             if (info) {
                 const durationStr = info.getDuration();
-                // Ensure string to avoid TS errors if definition varies
                 const d = parseFloat(String(durationStr));
                 if (!isNaN(d)) duration = d;
             }
@@ -91,9 +82,20 @@ export async function stitchVideos(options: StitchOptions): Promise<StitchResult
         }));
 
         const totalDuration = clipsMetadata.reduce((acc, clip) => acc + clip.duration, 0);
+        const totalSlowDuration = totalDuration * 2.0;
 
         // Log detected durations for debugging
         console.log('Detected Clip Durations:', clipsMetadata.map(c => `${c.uri.split('/').pop()}: ${c.duration}s`));
+        console.log('Total Output Duration (Slow-Mo):', totalSlowDuration);
+
+        // Enable progress callback with accurate duration
+        if (onProgress) {
+            FFmpegKitConfig.enableStatisticsCallback((stats) => {
+                const time = stats.getTime();
+                const progress = Math.min((time / 1000) / totalSlowDuration, 1);
+                onProgress(progress);
+            });
+        }
 
         // Build the FFmpeg command
         const command = buildFFmpegCommand(clipsMetadata, outputUri, audioUri);
@@ -139,21 +141,28 @@ function buildFFmpegCommand(clips: { uri: string, duration: number }[], outputUr
     const n = clips.length;
 
     for (let i = 0; i < n; i++) {
-        // Video: Normalize ONLY (Golden State - Verified Working)
-        // fps=30, scale=1080:1920, setsar=1, format=yuv420p
-        filterComplex += `[${i}:v]fps=30,scale=1080:1920,setsar=1,format=yuv420p[v${i}]; `;
+        // Video: Apply basic normalization + Saturation (Hue) + Slow Mo (setpts)
+        // setpts=2.0*PTS makes it 0.5x speed (Zen feel)
+        filterComplex += `[${i}:v]setpts=2.0*PTS,fps=30,scale=1080:1920,setsar=1,format=yuv420p,hue=s=0.5[v${i}]; `;
         videoNodes += `[v${i}]`;
     }
 
     // Simple Concat
-    filterComplex += `${videoNodes}concat=n=${n}:v=1:a=0[outv]; `;
+    filterComplex += `${videoNodes}concat=n=${n}:v=1:a=0[catv]; `;
+
+    // Global Effects: Film Grain + Vignette
+    filterComplex += `[catv]noise=alls=10:allf=t+u,vignette=angle=0.5[outv]; `;
+
+    // Total duration for the slow-mo video (2.0x PTS)
+    const totalSlowDuration = clips.reduce((acc, clip) => acc + (clip.duration * 2.0), 0);
 
     // Command structure:
     let command = `${inputs} ${audioInput} -filter_complex "${filterComplex}" -map "[outv]"`;
 
     if (audioUri) {
         // Map the extra audio input (index n)
-        command += ` -map ${n}:a -c:a aac -b:a 128k -shortest`;
+        // Apply lo-fi filters and limit to the calculated video duration
+        command += ` -map ${n}:a? -af "lowpass=f=3000,highpass=f=200,volume=0.4" -c:a aac -b:a 128k -t ${totalSlowDuration.toFixed(2)}`;
     } else {
         command += ` -an`;
     }

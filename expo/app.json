@@ -59,7 +59,8 @@
         {
           "sounds": []
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true
