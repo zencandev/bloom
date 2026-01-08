@@ -3,25 +3,26 @@
 
 export const Colors = {
     // Core palette
-    background: '#0a0a0a',
-    backgroundLight: '#141414',
-    surface: '#1a1a1a',
-    surfaceLight: '#242424',
+    background: '#1A1A1A',
+    backgroundLight: '#242424',
+    surface: '#2c2c2c',
+    surfaceLight: '#363636',
 
-    // Zen accent colors
-    sage: '#a8b5a0',
-    sageLight: '#c5d1be',
-    sageDark: '#7a8b72',
+    // Zen accent colors (Cherry Blossom Pink)
+    accent: '#FFB7C5',
+    accentLight: '#FFD1DC',
+    accentDark: '#E5A4B1',
+    sage: '#FFB7C5', // Alias for backward compatibility if needed
 
-    cream: '#f5f2e8',
-    creamDark: '#e5e0d0',
+    cream: '#F9F7F2',
+    creamDark: '#E8E6E0',
 
     gold: '#d4a574',
     goldLight: '#e8c5a0',
     goldDark: '#b88a5c',
 
     // State colors
-    bloom: '#8bc49e',
+    bloom: '#FFB7C5',
     seed: '#4a4a4a',
 
     // Text
@@ -34,8 +35,8 @@ export const Colors = {
     success: '#81c784',
 
     // Gradients (for use with LinearGradient)
-    gradientZen: ['#1a1a1a', '#0a0a0a'],
-    gradientBreath: ['#2d3a2d', '#1a2a1a', '#0a0a0a'],
+    gradientZen: ['#2c2c2c', '#1A1A1A'],
+    gradientBreath: ['#3d2d31', '#2a1a1e', '#1A1A1A'],
     gradientGold: ['#d4a574', '#b88a5c'],
 };
 
@@ -126,7 +127,7 @@ export const Shadows = {
         elevation: 8,
     },
     glow: {
-        shadowColor: '#a8b5a0',
+        shadowColor: '#FFB7C5',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.4,
         shadowRadius: 16,
