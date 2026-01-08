@@ -92,6 +92,9 @@ export async function stitchVideos(options: StitchOptions): Promise<StitchResult
 
         const totalDuration = clipsMetadata.reduce((acc, clip) => acc + clip.duration, 0);
 
+        // Log detected durations for debugging
+        console.log('Detected Clip Durations:', clipsMetadata.map(c => `${c.uri.split('/').pop()}: ${c.duration}s`));
+
         // Build the FFmpeg command
         const command = buildFFmpegCommand(clipsMetadata, outputUri, audioUri);
         console.log('FFmpeg command:', command);
@@ -122,116 +125,54 @@ function buildFFmpegCommand(clips: { uri: string, duration: number }[], outputUr
     const inputs = clips.map(c => `-i "${c.uri}"`).join(' ');
     const audioInput = audioUri ? `-i "${audioUri}"` : '';
 
-    // Simplified concat filter to avoid xfade issues
-    // [0:v][1:v]...concat=n=N:v=1:a=0[outv]
-
-    // Safety check for inputs
     if (clips.length < 2) {
-        // Should be handled by caller but just in case
         return `-i "${clips[0].uri}" -c copy -y "${outputUri}"`;
     }
 
+    // ROBUST LO-FI STITCHER (No Crossfade)
+    // We use CONCAT with filter pre-processing.
+    // This gives the "Vintage" look without the fragility of xfade.
+
     let filterComplex = '';
+    let videoNodes = '';
+    let audioNodes = '';
     const n = clips.length;
 
-    // COMPLEX FILTER CHAIN SYSTEM
-    // 1. Normalize Inputs (Resolution, FPS)
-    // 2. Apply Lo-Fi Filters (Audio/Video)
-    // 3. Apply Crossfade Transitions (Video/Audio)
-
-    let lastVideoLabel = 'v0_norm';
-    let lastAudioLabel = 'a0_norm';
-
-    // Step 1: Normalize and Filter Inputs
     for (let i = 0; i < n; i++) {
-        // Video: Normalize -> LoFi Adjustments (Saturation/Contrast)
-        // Note: We apply noise at the end to be uniform
-        filterComplex += `[${i}:v]fps=30,scale=1080:1920,setsar=1,format=yuv420p,eq=saturation=0.7:contrast=1.2[v${i}_norm]; `;
-        // Audio: Bandpass filter for Lo-Fi "Telephone" effect + Normalize Format (44.1k, Stereo)
-        // Critical: acrossfade requires identical sample rate/channels
-        filterComplex += `[${i}:a]lowpass=f=3000,highpass=f=300,volume=1.2,aresample=44100,ac=2[a${i}_norm]; `;
+        // Video: Normalize + Lo-Fi (Saturation/Contrast)
+        // fps=30, scale=1080:1920, setsar=1, format=yuv420p
+        // eq=saturation=0.7:contrast=1.2 (Vintage Look)
+        filterComplex += `[${i}:v]fps=30,scale=1080:1920,setsar=1,format=yuv420p,eq=saturation=0.7:contrast=1.2[v${i}]; `;
+        videoNodes += `[v${i}]`;
+
+        // Note: Clip audio is intentionally ignored as per user request to avoid crashes
+        // and because they will add their own Lo-Fi background track.
     }
 
-    // Step 2: Build Transition Chain
-    if (n === 1) {
-        lastVideoLabel = 'v0_norm';
-        lastAudioLabel = 'a0_norm';
-    } else {
-        // Calculate offsets dynamically based on actual duration of PREVIOUS clip
-        // Offset for transition between Clip A and Clip B is:
-        // (Start of A) + (Duration of A) - (Overlap)
-        // But for a chain, it accumulates.
+    // Simple Concat
+    filterComplex += `${videoNodes}concat=n=${n}:v=1:a=0[catv]; `;
 
-        let currentOffset = 0;
-        // First clip duration gives the first offset
-        // offset = clips[0].duration - overlap
+    // Global Effects: Film Grain on final output
+    filterComplex += `[catv]noise=alls=10:allf=t+u[outv]`;
 
-        // Initial transition: 0 -> 1
-        currentOffset = clips[0].duration - CROSSFADE_DURATION;
-        if (currentOffset < 0) currentOffset = 0; // Safety
+    // Command structure:
+    // -i clip1 -i clip2 ... [audioInput]
+    // Map [outv] (Video)
+    // If audioUri exists, map existing audio input directly (no complex mix needed if it's the only audio)
 
-        filterComplex += `[v0_norm][v1_norm]xfade=transition=fade:duration=${CROSSFADE_DURATION}:offset=${currentOffset.toFixed(2)}[v_mix_1]; `;
-        filterComplex += `[a0_norm][a1_norm]acrossfade=d=${CROSSFADE_DURATION}:c1=tri:c2=tri[a_mix_1]; `;
+    let command = `${inputs} ${audioInput} -filter_complex "${filterComplex}" -map "[outv]"`;
 
-        lastVideoLabel = 'v_mix_1';
-        lastAudioLabel = 'a_mix_1';
-
-        // Subsequent transitions
-        for (let i = 2; i < n; i++) {
-            // Add duration of the *previous* clip (clips[i-1]) to the offset
-            // Actually, correct formula for chain:
-            // Offset N = Offset (N-1) + Duration (N-1) - Overlap? 
-            // NO. Offset is absolute time.
-            // Start of Clip 0 = 0.
-            // Start of Clip 1 = Duration(0) - Overlap.
-            // Start of Clip 2 = Start(1) + Duration(1) - Overlap.
-            // So: currentOffset += clips[i-1].duration - CROSSFADE_DURATION.
-
-            currentOffset += clips[i - 1].duration - CROSSFADE_DURATION;
-            // Safety
-            if (currentOffset < 0) currentOffset = 0; // Should not happen if clips > 0.3s
-
-            let nextVideoLabel = `v_mix_${i}`;
-            let nextAudioLabel = `a_mix_${i}`;
-
-            filterComplex += `[${lastVideoLabel}][v${i}_norm]xfade=transition=fade:duration=${CROSSFADE_DURATION}:offset=${currentOffset.toFixed(2)}[${nextVideoLabel}]; `;
-            filterComplex += `[${lastAudioLabel}][a${i}_norm]acrossfade=d=${CROSSFADE_DURATION}:c1=tri:c2=tri[${nextAudioLabel}]; `;
-
-            lastVideoLabel = nextVideoLabel;
-            lastAudioLabel = nextAudioLabel;
-        }
-    }
-
-    // Step 3: Global Effects (Grain)
-    // Apply film grain noise to the final stitched video
-    filterComplex += `[${lastVideoLabel}]noise=alls=10:allf=t+u[outv]`;
-
-    // Build the final command
-    // Map the final video node [outv] and the final audio node [lastAudioLabel]
-    let command = `${inputs} ${audioInput} -filter_complex "${filterComplex}" -map "[outv]" -map "[${lastAudioLabel}]"`;
-
-    // Optional: Ambient Audio Overlay (if provided)
-    // If audioUri is present (e.g. music), we need to mix it with the stitched audio
-    // But the StitchOptions logic usually implies ambient audio replaces or mixes.
-    // Current logic in `stitchVideos` says: "Ambient audio overlay".
-    // Use `amix` to mix ambient with dialogue?
     if (audioUri) {
-        // const videoDuration = (n * CLIP_DURATION) - ((n - 1) * CROSSFADE_DURATION);
-        // We need to load ambient audio as input index `n`
-        // Then mix: [lastAudioLabel][n:a]amix=inputs=2:duration=first[outa]
-        // We need to append this to filter complex
-        // Update command to use new Mix output
-
-        // Removing the previous closing quote to append
-        // Hacky string manipulation, better to rebuild
-        command = `${inputs} ${audioInput} -filter_complex "${filterComplex}; [${lastAudioLabel}][${n}:a]amix=inputs=2:duration=first[outa]" -map "[outv]" -map "[outa]"`;
+        // Map the extra audio input (index n)
+        // -shortest ensure video doesn't run forever if audio is long? 
+        // Or -t videoDuration?
+        // Let's use -c:a aac -b:a 128k
+        command += ` -map ${n}:a -c:a aac -b:a 128k -shortest`;
     } else {
-        // Already mapped [lastAudioLabel]
+        command += ` -an`;
     }
 
-    // Output settings: Use mpeg4 for safety
     command += ` -c:v mpeg4 -q:v 5 -pix_fmt yuv420p -y "${outputUri}"`;
-
     return command;
 }
 
