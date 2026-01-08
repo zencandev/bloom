@@ -104,6 +104,25 @@ export async function scheduleDailyNudges(hasClipToday: boolean) {
 }
 
 /**
+ * Send an immediate test notification (5 seconds delay)
+ */
+export async function sendTestNotification() {
+    await Notifications.scheduleNotificationAsync({
+        content: {
+            title: "ZenSnap Test ✨",
+            body: "Your daily nudges are ready to bloom! 🌸",
+            // @ts-ignore
+            channelId: 'zensnap-reminders',
+        },
+        trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+            seconds: 5,
+        } as any,
+    });
+    console.log('ZenSnap: Test notification scheduled for 5 seconds from now.');
+}
+
+/**
  * Cancel notifications (e.g. if user turns off reminders in settings)
  */
 export async function cancelAllNudges() {

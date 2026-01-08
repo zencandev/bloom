@@ -5,7 +5,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
 import { useZenStore } from '../stores/zenStore';
 import { Colors } from '../constants/theme';
-import { requestNotificationPermissions, scheduleDailyNudges } from '../utils/notificationService';
+import { requestNotificationPermissions, scheduleDailyNudges, sendTestNotification } from '../utils/notificationService';
 
 export default function RootLayout() {
     const initializeWeek = useZenStore((state) => state.initializeWeek);
@@ -19,6 +19,8 @@ export default function RootLayout() {
             if (granted) {
                 const hasClipToday = !!useZenStore.getState().getTodayClip();
                 await scheduleDailyNudges(hasClipToday);
+                // Trigger a test notification for the user to see immediately (5s delay)
+                await sendTestNotification();
             }
         };
 
