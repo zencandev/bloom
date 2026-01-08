@@ -66,7 +66,6 @@ export async function scheduleDailyNudges(hasClipToday: boolean) {
         content: {
             title: "Morning Zen ☀️",
             body: getRandomMessage(),
-            // Double-register for safety across different SDK 54 patch versions
             // @ts-ignore
             channelId: 'zensnap-reminders',
             ...Platform.select({
@@ -113,13 +112,16 @@ export async function sendTestNotification() {
             body: "Your daily nudges are ready to bloom! 🌸",
             // @ts-ignore
             channelId: 'zensnap-reminders',
+            ...Platform.select({
+                android: { channelId: 'zensnap-reminders' },
+                default: {},
+            }) as any,
         },
         trigger: {
             type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
             seconds: 5,
         } as any,
     });
-    console.log('ZenSnap: Test notification scheduled for 5 seconds from now.');
 }
 
 /**

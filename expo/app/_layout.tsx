@@ -19,7 +19,7 @@ export default function RootLayout() {
             if (granted) {
                 const hasClipToday = !!useZenStore.getState().getTodayClip();
                 await scheduleDailyNudges(hasClipToday);
-                // Trigger a test notification for the user to see immediately (5s delay)
+                // TEST NOTIFICATION FOR ICON CHECK
                 await sendTestNotification();
             }
         };
