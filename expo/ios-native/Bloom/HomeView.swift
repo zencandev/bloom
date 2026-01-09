@@ -16,7 +16,7 @@ struct HomeView: View {
                     VStack(spacing: 0) {
                         // Header
                         VStack(spacing: 8) {
-                            Text("ZenSnap")
+                            Text("Bloom")
                                 .font(.system(size: 34, weight: .light))
                                 .foregroundColor(Theme.Colors.cream)
                                 .tracking(1)

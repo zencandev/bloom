@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>ZenSnap</string>
+	<string>Bloom</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -21,13 +21,13 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>NSCameraUsageDescription</key>
-	<string>ZenSnap needs camera access to capture your daily zen moments.</string>
+	<string>Bloom needs camera access to capture your daily zen moments.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>ZenSnap needs microphone access to record ambient sounds.</string>
+	<string>Bloom needs microphone access to record ambient sounds.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>ZenSnap needs access to save your weekly Zen video.</string>
+	<string>Bloom needs access to save your weekly Zen video.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>ZenSnap needs access to your photos to save videos.</string>
+	<string>Bloom needs access to your photos to save videos.</string>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>

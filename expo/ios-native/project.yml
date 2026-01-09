@@ -1,23 +1,27 @@
-name: ZenSnap
+name: Bloom
 options:
-  bundleIdPrefix: com.zensnap
+  bundleIdPrefix: com.ajaypalnitj
 settings:
   base:
-    PRODUCT_NAME: ZenSnap
+    PRODUCT_NAME: Bloom
     CURRENT_PROJECT_VERSION: 1
     MARKETING_VERSION: 1.0
     IPHONEOS_DEPLOYMENT_TARGET: 17.0
+    SDKROOT: iphoneos
+    SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    GENERATE_INFOPLIST_FILE: YES
 targets:
-  ZenSnap:
+  Bloom:
     type: application
     platform: iOS
     deploymentTarget: 17.0
     sources: 
-      - path: ZenSnap
+      - path: Bloom
     info:
-      path: ZenSnap/Info.plist
+      path: Bloom/Info.plist
       properties:
-        CFBundleDisplayName: "ZenSnap"
+        CFBundleDisplayName: "Bloom"
         UILaunchScreen:
           UIColorName: LaunchBackgroundColor
           UIImageName: SplashIcon
@@ -26,7 +30,20 @@ targets:
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
           - UIInterfaceOrientationPortraitUpsideDown
-        NSCameraUsageDescription: "ZenSnap needs camera access to capture your daily zen moments."
-        NSMicrophoneUsageDescription: "ZenSnap needs microphone access to record ambient sounds."
-        NSPhotoLibraryAddUsageDescription: "ZenSnap needs access to save your weekly Zen video."
-        NSPhotoLibraryUsageDescription: "ZenSnap needs access to your photos to save videos."
+        NSCameraUsageDescription: "Bloom needs camera access to capture your daily zen moments."
+        NSMicrophoneUsageDescription: "Bloom needs microphone access to record ambient sounds."
+        NSPhotoLibraryAddUsageDescription: "Bloom needs access to save your weekly Zen video."
+        NSPhotoLibraryUsageDescription: "Bloom needs access to your photos to save videos."
+schemes:
+  Bloom:
+    build:
+      targets:
+        Bloom: all
+    run:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

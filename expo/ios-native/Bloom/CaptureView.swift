@@ -102,13 +102,16 @@ struct CaptureView: View {
         .navigationBarHidden(true)
         .onAppear {
             cameraModel.checkPermissions()
-            // Auto-start recording after a short delay to allow camera release from transition
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                cameraModel.startRecording()
-            }
         }
         .onDisappear {
             cameraModel.stopSession()
+        }
+        .onChange(of: cameraModel.isSessionRunning) { _, isRunning in
+            if isRunning {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    cameraModel.startRecording()
+                }
+            }
         }
         .onChange(of: cameraModel.finalVideoURL) { _, newValue in
             if let url = newValue {

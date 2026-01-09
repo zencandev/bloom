@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct ZenSnapApp: App {
+struct BloomApp: App {
     var body: some Scene {
         WindowGroup {
             HomeView()
