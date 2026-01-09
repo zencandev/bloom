@@ -9,8 +9,8 @@ struct OnboardingView: View {
     let steps = [
         OnboardingStep(emoji: "🪷", title: "Welcome to Bloom", subtitle: "Capture the quiet. Own the week.", description: "A mindful way to journal your days through tiny video moments."),
         OnboardingStep(emoji: "🌬️", title: "Breathe First", subtitle: "The gateway to presence", description: "Before capturing, hold the breathing circle for 3 seconds. This moment of calm opens your camera."),
-        OnboardingStep(emoji: "📷", title: "1.5 Seconds", subtitle: "Constraint breeds creativity", description: "Your camera records exactly 1.5 seconds. Capture something peaceful—trees, coffee, a pet, the sky."),
-        OnboardingStep(emoji: "🎬", title: "Weekly Zen", subtitle: "Your week, cinematically", description: "After 7 days, your clips merge into a 10.5-second film with calming music. A tiny movie of your week.")
+        OnboardingStep(emoji: "📷", title: "The Moment", subtitle: "Constraint breeds creativity", description: "Your camera captures a tiny fragment of time. Look for something peaceful—trees, coffee, a pet, the sky."),
+        OnboardingStep(emoji: "🎬", title: "Weekly Zen", subtitle: "Your week, cinematically", description: "After 7 days, your clips merge into a cinematic film with calming music. A tiny movie of your week.")
     ]
     
     var body: some View {

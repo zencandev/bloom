@@ -62,14 +62,14 @@ val onboardingSteps = listOf(
     ),
     OnboardingStep(
         emoji = "📷",
-        title = "1.5 Seconds",
+        title = "The Moment",
         subtitle = "Constraint breeds creativity",
-        description = "Your camera records exactly 1.5 seconds. Capture something peaceful—trees, coffee, a pet, the sky."
+        description = "Your camera captures a tiny fragment of time. Look for something peaceful—trees, coffee, a pet, the sky."
     ),
     OnboardingStep(
         emoji = "🎬",
         title = "Weekly Zen",
         subtitle = "Your week, cinematically",
-        description = "After 7 days, your clips merge into a 10.5-second film with calming music. A tiny movie of your week."
+        description = "After 7 days, your clips merge into a cinematic film with calming music. A tiny movie of your week."
     )
 )
