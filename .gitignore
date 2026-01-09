@@ -23,3 +23,5 @@ dist/
 
 # Expo (Legacy)
 expo/
+
+.vscode
