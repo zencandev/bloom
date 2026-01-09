@@ -1,0 +1,25 @@
+# Android
+android-native/.gradle/
+android-native/build/
+android-native/app/build/
+android-native/local.properties
+android-native/.idea/
+android-native/*.iml
+android-native/.cxx/
+
+# iOS
+ios-native/.DS_Store
+ios-native/DerivedData/
+ios-native/build/
+ios-native/*.xcresult
+ios-native/xcuserdata/
+
+# General
+.DS_Store
+node_modules/
+dist/
+.env
+*.log
+
+# Expo (Legacy)
+expo/

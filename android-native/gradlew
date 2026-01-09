@@ -1,0 +1,50 @@
+#!/bin/sh
+
+#
+# Gradle start up script for POSIX
+#
+
+# Attempt to set APP_HOME
+if [ -z "$APP_HOME" ] || [ ! -d "$APP_HOME" ]; then
+    PRG="$0"
+    while [ -h "$PRG" ]; do
+        ls=`ls -ld "$PRG"`
+        link=`expr "$ls" : '.*-> \(.*\)$'`
+        if expr "$link" : '/.*' > /dev/null; then
+            PRG="$link"
+        else
+            PRG=`dirname "$PRG"`"/$link"
+        fi
+    done
+    APP_HOME=`dirname "$PRG"`
+    cd "$APP_HOME" || exit 1
+    APP_HOME=`pwd`
+fi
+
+APP_NAME="Gradle"
+CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+
+# Determine the Java command to use
+if [ -n "$JAVA_HOME" ] ; then
+    JAVACMD="$JAVA_HOME/bin/java"
+else
+    JAVACMD=`which java`
+fi
+
+if [ ! -x "$JAVACMD" ] ; then
+    echo "Error: JAVA_HOME is not set and no 'java' command could be found."
+    exit 1
+fi
+
+# Download gradle wrapper jar if not present
+if [ ! -f "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" ]; then
+    echo "Downloading gradle-wrapper.jar..."
+    mkdir -p "$APP_HOME/gradle/wrapper"
+    curl -L -o "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" \
+        "https://github.com/gradle/gradle/raw/v8.4.0/gradle/wrapper/gradle-wrapper.jar"
+fi
+
+exec "$JAVACMD" \
+    -classpath "$CLASSPATH" \
+    org.gradle.wrapper.GradleWrapperMain \
+    "$@"
