@@ -1,0 +1,32 @@
+name: ZenSnap
+options:
+  bundleIdPrefix: com.zensnap
+settings:
+  base:
+    PRODUCT_NAME: ZenSnap
+    CURRENT_PROJECT_VERSION: 1
+    MARKETING_VERSION: 1.0
+    IPHONEOS_DEPLOYMENT_TARGET: 17.0
+targets:
+  ZenSnap:
+    type: application
+    platform: iOS
+    deploymentTarget: 17.0
+    sources: 
+      - path: ZenSnap
+    info:
+      path: ZenSnap/Info.plist
+      properties:
+        CFBundleDisplayName: "ZenSnap"
+        UILaunchScreen:
+          UIColorName: LaunchBackgroundColor
+          UIImageName: SplashIcon
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+          - UIInterfaceOrientationPortraitUpsideDown
+        NSCameraUsageDescription: "ZenSnap needs camera access to capture your daily zen moments."
+        NSMicrophoneUsageDescription: "ZenSnap needs microphone access to record ambient sounds."
+        NSPhotoLibraryAddUsageDescription: "ZenSnap needs access to save your weekly Zen video."
+        NSPhotoLibraryUsageDescription: "ZenSnap needs access to your photos to save videos."

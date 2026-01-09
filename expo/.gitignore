@@ -39,3 +39,13 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# iOS Native
+ios-native/build/
+ios-native/*.mode1v3
+ios-native/*.mode2v3
+ios-native/*.moved-aside
+ios-native/*.pbxuser
+ios-native/*.perspectivev3
+ios-native/ZenSnap.xcodeproj/project.xcworkspace/xcuserdata
+ios-native/ZenSnap.xcodeproj/xcuserdata
