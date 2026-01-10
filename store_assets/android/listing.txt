@@ -1,0 +1,14 @@
+Title: Bloom
+Short Description: Blossom into your best self. Daily video journal, breathing, and reflection.
+
+Full Description:
+Bloom is your personal video journal for growth and mindfulness. Just as a flower blooms, take a moment every day to nurture yourself.
+
+**Features:**
+*   **Daily Bloom:** Capture short video clips of your day to document your personal growth.
+*   **Breathe:** Use the built-in breathing guide to center yourself before capturing your moment.
+*   **Ambient Sound:** Record the sounds of your environment to create a truly immersive memory.
+*   **Weekly Garden:** Stitch your daily moments into a weekly summary to see your week in review.
+*   **Private & Secure:** All your data is stored locally on your device.
+
+Start your journey to mindfulness today with Bloom.
