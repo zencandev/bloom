@@ -1,4 +1,4 @@
-package com.zensnap.bloom.ui.screens
+package com.zencan.bloom.ui.screens
 
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zensnap.bloom.ui.theme.BloomColors
+import com.zencan.bloom.ui.theme.BloomColors
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalComposeUiApi::class)

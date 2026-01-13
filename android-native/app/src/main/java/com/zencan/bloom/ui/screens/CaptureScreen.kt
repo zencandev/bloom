@@ -1,4 +1,4 @@
-package com.zensnap.bloom.ui.screens
+package com.zencan.bloom.ui.screens
 
 import android.Manifest
 import android.content.Context
@@ -32,9 +32,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.zensnap.bloom.data.DayClip
-import com.zensnap.bloom.data.ZenStore
-import com.zensnap.bloom.ui.theme.BloomColors
+import com.zencan.bloom.data.DayClip
+import com.zencan.bloom.data.ZenStore
+import com.zencan.bloom.ui.theme.BloomColors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File

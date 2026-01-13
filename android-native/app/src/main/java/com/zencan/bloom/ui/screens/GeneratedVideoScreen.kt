@@ -1,4 +1,4 @@
-package com.zensnap.bloom.ui.screens
+package com.zencan.bloom.ui.screens
 
 import android.content.ContentValues
 import android.os.Build
@@ -28,9 +28,9 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import com.zensnap.bloom.data.ZenStore
-import com.zensnap.bloom.ui.theme.BloomColors
-import com.zensnap.bloom.video.VideoStitcher
+import com.zencan.bloom.data.ZenStore
+import com.zencan.bloom.ui.theme.BloomColors
+import com.zencan.bloom.video.VideoStitcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

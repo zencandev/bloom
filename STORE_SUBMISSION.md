@@ -5,6 +5,7 @@
 | Field | Content |
 | :--- | :--- |
 | **App Title** | Bloom: Capture the Quiet |
+| **Package Name (Android)** | com.zencan.bloom |
 | **Short Description** | One moment a day. A cinematic recap every week. |
 | **Category** | Health & Fitness / Lifestyle |
 | **Keywords** | mindfulness, gratitude, video journal, slow motion, zen, daily habit, reflection |

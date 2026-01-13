@@ -1,4 +1,4 @@
-package com.zensnap.bloom.ui.screens
+package com.zencan.bloom.ui.screens
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -15,9 +15,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zensnap.bloom.data.ZenStore
-import com.zensnap.bloom.data.onboardingSteps
-import com.zensnap.bloom.ui.theme.BloomColors
+import com.zencan.bloom.data.ZenStore
+import com.zencan.bloom.data.onboardingSteps
+import com.zencan.bloom.ui.theme.BloomColors
 import kotlinx.coroutines.launch
 
 @Composable

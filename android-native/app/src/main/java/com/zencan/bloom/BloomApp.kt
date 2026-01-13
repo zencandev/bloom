@@ -1,4 +1,4 @@
-package com.zensnap.bloom
+package com.zencan.bloom
 
 import android.app.Application
 import android.app.NotificationChannel

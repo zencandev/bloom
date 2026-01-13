@@ -1,4 +1,4 @@
-package com.zensnap.bloom.ui.screens
+package com.zencan.bloom.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -20,8 +20,8 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import com.zensnap.bloom.data.ZenStore
-import com.zensnap.bloom.ui.theme.BloomColors
+import com.zencan.bloom.data.ZenStore
+import com.zencan.bloom.ui.theme.BloomColors
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*

@@ -1,4 +1,4 @@
-package com.zensnap.bloom.data
+package com.zencan.bloom.data
 
 import kotlinx.serialization.Serializable
 

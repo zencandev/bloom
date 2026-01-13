@@ -1,4 +1,4 @@
-package com.zensnap.bloom
+package com.zencan.bloom
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -24,12 +24,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.zensnap.bloom.data.Route
-import com.zensnap.bloom.data.ZenStore
-import com.zensnap.bloom.notifications.NotificationScheduler
-import com.zensnap.bloom.ui.screens.*
-import com.zensnap.bloom.ui.theme.BloomColors
-import com.zensnap.bloom.ui.theme.BloomTheme
+import com.zencan.bloom.data.Route
+import com.zencan.bloom.data.ZenStore
+import com.zencan.bloom.notifications.NotificationScheduler
+import com.zencan.bloom.ui.screens.*
+import com.zencan.bloom.ui.theme.BloomColors
+import com.zencan.bloom.ui.theme.BloomTheme
 
 class MainActivity : ComponentActivity() {
     

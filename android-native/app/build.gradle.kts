@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.zensnap.bloom"
+    namespace = "com.zencan.bloom"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.zensnap.bloom"
+        applicationId = "com.zencan.bloom"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.zensnap.bloom.notifications
+package com.zencan.bloom.notifications
 
 import android.Manifest
 import android.app.AlarmManager
@@ -11,9 +11,9 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.zensnap.bloom.BloomApp
-import com.zensnap.bloom.MainActivity
-import com.zensnap.bloom.R
+import com.zencan.bloom.BloomApp
+import com.zencan.bloom.MainActivity
+import com.zencan.bloom.R
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.*
@@ -172,7 +172,7 @@ class NotificationReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val action = intent.getStringExtra("action") ?: "REMINDER"
-        val zenStore = com.zensnap.bloom.data.ZenStore(context)
+        val zenStore = com.zencan.bloom.data.ZenStore(context)
         
         val scope = MainScope()
         val pendingResult = goAsync()
@@ -189,12 +189,12 @@ class NotificationReceiver : BroadcastReceiver() {
                         // Check last week in history for generation if missing
                         val lastWeek = zenStore.history.value.firstOrNull()
                         if (lastWeek != null && lastWeek.generatedVideoUri == null && lastWeek.clips.isNotEmpty()) {
-                            val result = com.zensnap.bloom.video.VideoStitcher.makeZenVideo(
+                            val result = com.zencan.bloom.video.VideoStitcher.makeZenVideo(
                                 context,
                                 lastWeek.clips.sortedBy { it.dayIndex }.map { it.videoUri },
                                 "zen_music_yoga.mp3"
                             )
-                            if (result is com.zensnap.bloom.video.VideoStitcher.Result.Success) {
+                            if (result is com.zencan.bloom.video.VideoStitcher.Result.Success) {
                                 // Update the history item with the new URI
                                 val updatedHistory = zenStore.history.value.toMutableList()
                                 updatedHistory[0] = lastWeek.copy(generatedVideoUri = result.outputPath)
@@ -238,7 +238,7 @@ class NotificationReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         
-        val notification = NotificationCompat.Builder(context, com.zensnap.bloom.BloomApp.NOTIFICATION_CHANNEL_ID)
+        val notification = NotificationCompat.Builder(context, com.zencan.bloom.BloomApp.NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_camera)
             .setContentTitle("Last week is in Bloom 🌸")
             .setContentText("Relive last week's Zen and capture your first moment of this week!")

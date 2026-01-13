@@ -1,4 +1,4 @@
-package com.zensnap.bloom.video
+package com.zencan.bloom.video
 
 import android.content.Context
 import android.util.Log

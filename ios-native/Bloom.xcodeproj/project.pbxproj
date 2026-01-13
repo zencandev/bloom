@@ -164,7 +164,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ajaypalnitj.Bloom;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zencan.Bloom;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -182,7 +182,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ajaypalnitj.Bloom;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zencan.Bloom;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
