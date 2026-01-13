@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloom: Capture the Quiet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #121412;
+            --surface: #1E211E;
+            --sage: #B4C8B4;
+            --cream: #F5F5F0;
+            --text-secondary: #A0A5A0;
+            --accent: #E8F0E8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--cream);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 300;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            padding: 2rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            color: var(--sage);
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 2rem;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--sage);
+        }
+
+        .hero {
+            display: flex;
+            align-items: center;
+            min-height: 80vh;
+            padding: 4rem 0;
+            gap: 4rem;
+        }
+
+        .hero-content {
+            flex: 1;
+            animation: slideInLeft 1s ease-out;
+        }
+
+        .hero-image {
+            flex: 1.2;
+            position: relative;
+            animation: slideInRight 1.2s ease-out;
+        }
+
+        .hero-image img {
+            width: 100%;
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            transition: transform 0.5s;
+        }
+
+        .hero-image:hover img {
+            transform: translateY(-10px);
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        h1 span {
+            color: var(--sage);
+        }
+
+        p.subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            max-width: 500px;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: var(--sage);
+            color: var(--bg);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            border: 1px solid var(--text-secondary);
+            color: var(--cream);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        section {
+            padding: 8rem 0;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3rem;
+        }
+
+        .feature-card {
+            background-color: var(--surface);
+            padding: 3rem;
+            border-radius: 32px;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--sage);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        footer {
+            padding: 4rem 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--text-secondary);
+            margin: 0 1rem;
+            text-decoration: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @media (max-width: 900px) {
+            .hero {
+                flex-direction: column-reverse;
+                text-align: center;
+                padding: 2rem 0;
+            }
+            .hero-image { width: 100%; }
+            h1 { font-size: 3rem; }
+            .cta-group { justify-content: center; }
+            .features { grid-template-columns: 1fr; }
+            p.subtitle { margin-left: auto; margin-right: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <a href="#" class="logo">BLOOM</a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="privacy.html">Privacy</a>
+            </div>
+        </header>
+
+        <main>
+            <section class="hero">
+                <div class="hero-content">
+                    <h1>Capture the <span>Quiet</span></h1>
+                    <p class="subtitle">A minimalist video journal. One breath, one moment, every single day.</p>
+                    <div class="cta-group">
+                        <a href="#" class="btn btn-primary">Download App</a>
+                        <a href="#features" class="btn btn-secondary">Learn More</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="hero.png" alt="Bloom App Hero">
+                </div>
+            </section>
+
+            <section id="features" class="features">
+                <div class="feature-card">
+                    <h3>The Breath</h3>
+                    <p>A 3-second guided pause before every capture to help you center yourself.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>The Moment</h3>
+                    <p>Capture exactly 1.5 seconds of pure life. No filters, no edits, just the present.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Weekly Zen</h3>
+                    <p>An automated, cinematic recap of your week arrives every Monday morning.</p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Zencan Bloom. All rights reserved.</p>
+            <div style="margin-top: 1rem;">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="#">Support</a>
+                <a href="https://github.com/ajaypalnitj/zensnap">GitHub</a>
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html>

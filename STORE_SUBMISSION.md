@@ -10,6 +10,7 @@
 | **Category** | Health & Fitness / Lifestyle |
 | **Keywords** | mindfulness, gratitude, video journal, slow motion, zen, daily habit, reflection |
 | **Primary Language** | English (US) |
+| **Target Age Group**| 18 and over (Recommended to avoid Families Policy) |
 
 ## ✍️ Descriptions
 
@@ -52,6 +53,6 @@ No filters, no social pressure, no distractions. Just you, your breath, and the 
 
 ## ⚖️ Legal & Support
 
-*   **Privacy Policy**: [Suggest hosting a simple MD file on GitHub Pages or a site like Termly]
-*   **Support URL**: [User's Portfolio or GitHub Repo]
+*   **Privacy Policy**: [https://ajaypalnitj.github.io/zensnap/privacy.html](https://ajaypalnitj.github.io/zensnap/privacy.html)
+*   **Support URL**: [https://ajaypalnitj.github.io/zensnap/](https://ajaypalnitj.github.io/zensnap/)
 *   **Contact Email**: [User's Email]
