@@ -13,10 +13,14 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
--keep,includedescriptorclasses class com.zensnap.bloom.**$$serializer { *; }
--keepclassmembers class com.zensnap.bloom.** {
+-keep,includedescriptorclasses class com.zencan.bloom.**$$serializer { *; }
+-keepclassmembers class com.zencan.bloom.** {
     *** Companion;
 }
--keepclasseswithmembers class com.zensnap.bloom.** {
+-keepclasseswithmembers class com.zencan.bloom.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
+
+# FFmpegKit - although usually embedded, these protect the native interface
+-keep class com.arthenica.ffmpegkit.** { *; }
+-keep class com.arthenica.smartmetadataretriever.** { *; }

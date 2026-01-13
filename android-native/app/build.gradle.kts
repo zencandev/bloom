@@ -23,11 +23,15 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Provide full native symbols to Play Console for FFmpeg debugging
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
             // Ensure V2/V3 signing for 16KB alignment support
             signingConfig = signingConfigs.getByName("debug") // User will replace with release key
         }
