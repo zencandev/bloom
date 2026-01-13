@@ -60,7 +60,7 @@ fun GeneratedVideoScreen(
     
     // Trigger video generation if not already generated
     LaunchedEffect(weekData.clips.size, videoUri) {
-        if (videoUri == null && weekData.clips.size >= 7 && !isGenerating) {
+        if (videoUri == null && weekData.clips.isNotEmpty() && !isGenerating) {
             isGenerating = true
             generationError = null
             

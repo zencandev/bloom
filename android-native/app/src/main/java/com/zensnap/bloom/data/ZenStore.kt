@@ -31,11 +31,15 @@ class ZenStore(private val context: Context) {
     companion object {
         private val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
         private val CURRENT_WEEK = stringPreferencesKey("current_week")
+        private val WEEK_HISTORY = stringPreferencesKey("week_history")
     }
     
     // In-memory state
     private val _currentWeek = MutableStateFlow(createNewWeek())
     val currentWeek: StateFlow<WeekData> = _currentWeek.asStateFlow()
+    
+    private val _history = MutableStateFlow<List<WeekData>>(emptyList())
+    val history: StateFlow<List<WeekData>> = _history.asStateFlow()
     
     private val _hasCompletedOnboarding = MutableStateFlow(false)
     val hasCompletedOnboarding: StateFlow<Boolean> = _hasCompletedOnboarding.asStateFlow()
@@ -51,12 +55,24 @@ class ZenStore(private val context: Context) {
             // Load week data
             prefs[CURRENT_WEEK]?.let { weekJson ->
                 try {
-                    _currentWeek.value = json.decodeFromString(weekJson)
+                    val loadedWeek = json.decodeFromString<WeekData>(weekJson)
+                    _currentWeek.value = loadedWeek
                 } catch (e: Exception) {
                     // If parsing fails, use default
                 }
             }
+            
+            // Load history
+            prefs[WEEK_HISTORY]?.let { historyJson ->
+                try {
+                    _history.value = json.decodeFromString<List<WeekData>>(historyJson)
+                } catch (e: Exception) {
+                    // Skip if fails
+                }
+            }
         }
+        
+        rotateWeekIfNecessary()
         
         // Deliberate delay to show splash screen
         kotlinx.coroutines.delay(1800)
@@ -74,9 +90,44 @@ class ZenStore(private val context: Context) {
         val updatedClips = _currentWeek.value.clips.filter { it.dayIndex != clip.dayIndex } + clip
         _currentWeek.value = _currentWeek.value.copy(
             clips = updatedClips,
-            isComplete = updatedClips.size >= 7
+            isComplete = updatedClips.size >= 1 // At least one clip makes it eligible for generation
         )
         saveWeekData()
+    }
+    
+    suspend fun rotateWeekIfNecessary() {
+        val freshWeek = createNewWeek()
+        if (freshWeek.weekId != _currentWeek.value.weekId) {
+            // New week has started, archive current week if it has clips
+            if (_currentWeek.value.clips.isNotEmpty()) {
+                val updatedHistory = listOf(_currentWeek.value) + _history.value
+                _history.value = updatedHistory.take(10) // Keep last 10 weeks
+                saveHistory()
+            }
+            _currentWeek.value = freshWeek
+            saveWeekData()
+        }
+    }
+    
+    suspend fun forceRotateWeek() {
+        if (_currentWeek.value.clips.isNotEmpty()) {
+            val updatedHistory = listOf(_currentWeek.value) + _history.value
+            _history.value = updatedHistory.take(10)
+            saveHistory()
+        }
+        _currentWeek.value = createNewWeek()
+        saveWeekData()
+    }
+
+    suspend fun updateHistory(newHistory: List<WeekData>) {
+        _history.value = newHistory
+        saveHistory()
+    }
+
+    private suspend fun saveHistory() {
+        context.dataStore.edit { prefs ->
+            prefs[WEEK_HISTORY] = json.encodeToString(_history.value)
+        }
     }
     
     suspend fun clearGeneratedVideo() {

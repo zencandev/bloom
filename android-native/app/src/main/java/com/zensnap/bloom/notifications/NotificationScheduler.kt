@@ -26,6 +26,9 @@ object NotificationScheduler {
     
     private const val MORNING_HOUR = 9
     private const val EVENING_HOUR = 17
+    private const val MONDAY_GENERATE_HOUR = 0
+    private const val MONDAY_GENERATE_MINUTE = 1
+    private const val MONDAY_SUMMARY_HOUR = 9
     
     fun hasNotificationPermission(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -45,10 +48,52 @@ object NotificationScheduler {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         if (!hasNotificationPermission(context)) return
 
-        // Schedule 9 AM
-        scheduleDaily(context, alarmManager, 9, 0, 100)
-        // Schedule 5 PM
-        scheduleDaily(context, alarmManager, 17, 0, 101)
+        // Daily 9 AM and 5 PM reminders
+        scheduleDaily(context, alarmManager, MORNING_HOUR, 0, 100)
+        scheduleDaily(context, alarmManager, EVENING_HOUR, 0, 101)
+        
+        // Monday 12:01 AM generation (End of week)
+        scheduleWeekly(context, alarmManager, Calendar.MONDAY, MONDAY_GENERATE_HOUR, MONDAY_GENERATE_MINUTE, 200)
+        
+        // Monday 9 AM summary (Watch notification)
+        scheduleWeekly(context, alarmManager, Calendar.MONDAY, MONDAY_SUMMARY_HOUR, 0, 201)
+    }
+
+    private fun scheduleWeekly(
+        context: Context,
+        alarmManager: AlarmManager,
+        dayOfWeek: Int,
+        hour: Int,
+        minute: Int,
+        requestCode: Int
+    ) {
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.DAY_OF_WEEK, dayOfWeek)
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+            set(Calendar.SECOND, 0)
+            
+            if (timeInMillis <= System.currentTimeMillis()) {
+                add(Calendar.WEEK_OF_YEAR, 1)
+            }
+        }
+        
+        val intent = Intent(context, NotificationReceiver::class.java).apply {
+            putExtra("action", if (dayOfWeek == Calendar.SUNDAY) "GENERATE" else "SUMMARY")
+        }
+        
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        
+        try {
+            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun scheduleDaily(
@@ -126,23 +171,51 @@ class NotificationReceiver : BroadcastReceiver() {
     )
 
     override fun onReceive(context: Context, intent: Intent) {
+        val action = intent.getStringExtra("action") ?: "REMINDER"
         val zenStore = com.zensnap.bloom.data.ZenStore(context)
         
-        // Use a coroutine to check the data store
         val scope = MainScope()
         val pendingResult = goAsync()
         
         scope.launch {
             try {
-                // Initialize store to load current week data
                 zenStore.initialize()
                 
-                // Only show notification if no clip for today
-                if (!zenStore.hasClipForToday()) {
-                    showNotification(context)
+                when (action) {
+                    "GENERATE" -> {
+                        // Monday 12:01 AM: Transition week and generate if clips exist
+                        zenStore.rotateWeekIfNecessary()
+                        
+                        // Check last week in history for generation if missing
+                        val lastWeek = zenStore.history.value.firstOrNull()
+                        if (lastWeek != null && lastWeek.generatedVideoUri == null && lastWeek.clips.isNotEmpty()) {
+                            val result = com.zensnap.bloom.video.VideoStitcher.makeZenVideo(
+                                context,
+                                lastWeek.clips.sortedBy { it.dayIndex }.map { it.videoUri },
+                                "zen_music_yoga.mp3"
+                            )
+                            if (result is com.zensnap.bloom.video.VideoStitcher.Result.Success) {
+                                // Update the history item with the new URI
+                                val updatedHistory = zenStore.history.value.toMutableList()
+                                updatedHistory[0] = lastWeek.copy(generatedVideoUri = result.outputPath)
+                                // We need a way to save history directly from here or update it in ZenStore
+                                zenStore.updateHistory(updatedHistory)
+                            }
+                        }
+                    }
+                    "SUMMARY" -> {
+                        // Monday 9 AM: Watch notification
+                        showSummaryNotification(context)
+                    }
+                    else -> {
+                        // Normal daily reminder
+                        if (!zenStore.hasClipForToday()) {
+                            showNotification(context)
+                        }
+                    }
                 }
                 
-                // Reschedule for next day (to keep it going)
+                // Reschedule everything
                 NotificationScheduler.scheduleReminders(context)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -150,6 +223,32 @@ class NotificationReceiver : BroadcastReceiver() {
                 pendingResult.finish()
             }
         }
+    }
+
+    private fun showSummaryNotification(context: Context) {
+        val tapIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("navigate_to", "history")
+        }
+        
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            99,
+            tapIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        
+        val notification = NotificationCompat.Builder(context, com.zensnap.bloom.BloomApp.NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_menu_camera)
+            .setContentTitle("Your Weekly Zen is ready 🎬")
+            .setContentText("Watch your moments from last week.")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .build()
+        
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(200, notification)
     }
 
     private fun showNotification(context: Context) {

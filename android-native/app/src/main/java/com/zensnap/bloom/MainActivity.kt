@@ -63,7 +63,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = BloomColors.Background
                 ) {
-                    BloomNavigation(zenStore)
+                    val navigateTo = intent.getStringExtra("navigate_to")
+                    BloomNavigation(zenStore, navigateTo)
                 }
             }
         }
@@ -89,7 +90,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun BloomNavigation(zenStore: ZenStore) {
+fun BloomNavigation(zenStore: ZenStore, navigateTo: String? = null) {
     val navController = rememberNavController()
     
     val hasCompletedOnboarding by zenStore.hasCompletedOnboarding.collectAsState()
@@ -98,6 +99,13 @@ fun BloomNavigation(zenStore: ZenStore) {
     LaunchedEffect(Unit) {
         if (!isInitialized) {
             zenStore.initialize()
+        }
+    }
+    
+    // Handle deep-link navigation
+    LaunchedEffect(isInitialized, navigateTo) {
+        if (isInitialized && navigateTo == "history") {
+            navController.navigate(Route.GeneratedVideo.route)
         }
     }
     

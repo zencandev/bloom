@@ -31,6 +31,7 @@ fun HomeScreen(
     onNavigateToGeneratedVideo: () -> Unit
 ) {
     val weekData by zenStore.currentWeek.collectAsState()
+    val history by zenStore.history.collectAsState()
     val scrollState = rememberScrollState()
     
     Column(
@@ -110,7 +111,8 @@ fun HomeScreen(
         }
         
         // Generate Weekly Zen Button
-        if (weekData.clips.size >= 7) {
+        // Allow manual generation if they have at least 1 clip
+        if (weekData.clips.isNotEmpty()) {
             val isGenerated = weekData.generatedVideoUri != null
             
             Button(
@@ -141,8 +143,8 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(40.dp))
         
         // History Section
-        if (weekData.generatedVideoUri != null) {
-            HistorySection(onNavigateToGeneratedVideo)
+        if (history.isNotEmpty()) {
+            HistorySection(history, onNavigateToGeneratedVideo)
         }
         
         Spacer(modifier = Modifier.height(20.dp))
@@ -302,7 +304,10 @@ private fun ProgressSection(clipCount: Int) {
 }
 
 @Composable
-private fun HistorySection(onNavigateToGeneratedVideo: () -> Unit) {
+private fun HistorySection(
+    history: List<WeekData>,
+    onNavigateToGeneratedVideo: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start
@@ -317,38 +322,53 @@ private fun HistorySection(onNavigateToGeneratedVideo: () -> Unit) {
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onNavigateToGeneratedVideo() },
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = BloomColors.Surface)
-        ) {
-            Row(
+        history.forEach { week ->
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(bottom = 12.dp)
+                    .clickable { 
+                        if (week.generatedVideoUri != null) {
+                            onNavigateToGeneratedVideo() 
+                        }
+                    },
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = BloomColors.Surface)
             ) {
-                Column {
-                    Text(
-                        text = "Week 2 · Jan 2026",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = BloomColors.Cream
-                    )
-                    Text(
-                        text = "7 clips",
-                        fontSize = 12.sp,
-                        color = BloomColors.Sage
-                    )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "Week ${week.weekId.substringAfter("-W")}",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = BloomColors.Cream
+                        )
+                        Text(
+                            text = "${week.clips.size} clips",
+                            fontSize = 12.sp,
+                            color = BloomColors.Sage
+                        )
+                    }
+                    if (week.generatedVideoUri != null) {
+                        Text(
+                            text = "›",
+                            fontSize = 20.sp,
+                            color = BloomColors.TextMuted
+                        )
+                    } else {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                            color = BloomColors.TextMuted
+                        )
+                    }
                 }
-                Text(
-                    text = "›",
-                    fontSize = 20.sp,
-                    color = BloomColors.TextMuted
-                )
             }
         }
     }
