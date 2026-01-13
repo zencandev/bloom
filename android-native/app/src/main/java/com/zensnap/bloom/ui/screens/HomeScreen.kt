@@ -111,8 +111,8 @@ fun HomeScreen(
         }
         
         // Generate Weekly Zen Button
-        // Allow manual generation if they have at least 1 clip
-        if (weekData.clips.isNotEmpty()) {
+        // Manual generation available only after Sunday's video is captured
+        if (zenStore.getClip(6) != null) {
             val isGenerated = weekData.generatedVideoUri != null
             
             Button(
