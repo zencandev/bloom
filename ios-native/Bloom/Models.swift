@@ -19,6 +19,7 @@ struct WeekData: Codable {
 
 class ZenStore: ObservableObject {
     @Published var currentWeek: WeekData
+    @Published var history: [WeekData]
     @Published var hasCompletedOnboarding: Bool {
         didSet {
             UserDefaults.standard.set(hasCompletedOnboarding, forKey: "hasCompletedOnboarding")
@@ -27,6 +28,9 @@ class ZenStore: ObservableObject {
     
     // Navigation State
     @Published var path = [Route]()
+    
+    private let weekKey = "current_week_data"
+    private let historyKey = "week_history_data"
     
     enum Route: Hashable {
         case breathe(dayIndex: Int)
@@ -40,33 +44,74 @@ class ZenStore: ObservableObject {
     
     init() {
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
-        // Initialize with default or loaded data
-        self.currentWeek = WeekData(
-            weekId: "2026-W02",
-            startDate: Date().ISO8601Format(),
-            clips: [],
-            isComplete: false,
-            generatedVideoUri: nil
-        )
+        
+        // Load week data
+        if let data = UserDefaults.standard.data(forKey: weekKey),
+           let loadedWeek = try? JSONDecoder().decode(WeekData.self, from: data) {
+            self.currentWeek = loadedWeek
+        } else {
+            self.currentWeek = ZenStore.createNewWeek()
+        }
+        
+        // Load history
+        if let data = UserDefaults.standard.data(forKey: historyKey),
+           let loadedHistory = try? JSONDecoder().decode([WeekData].self, from: data) {
+            self.history = loadedHistory
+        } else {
+            self.history = []
+        }
         
         if !hasCompletedOnboarding {
             path = [.onboarding]
         }
+        
+        rotateWeekIfNecessary()
     }
     
     func completeOnboarding() {
         hasCompletedOnboarding = true
-        // Clear onboarding from path
         path.removeAll(where: { $0 == .onboarding })
     }
     
     func addClip(_ clip: DayClip) {
         currentWeek.clips.removeAll { $0.dayIndex == clip.dayIndex }
         currentWeek.clips.append(clip)
-        currentWeek.isComplete = currentWeek.clips.count >= 7
-        
-        // Update notifications
+        currentWeek.isComplete = currentWeek.clips.count >= 1 // Flexible generation
+        saveWeekData()
         refreshNotifications()
+    }
+    
+    func rotateWeekIfNecessary() {
+        let freshWeek = ZenStore.createNewWeek()
+        if freshWeek.weekId != currentWeek.weekId {
+            // New week starts, archive current
+            if !currentWeek.clips.isEmpty {
+                history.insert(currentWeek, at: 0)
+                if history.count > 10 {
+                    history = Array(history.prefix(10))
+                }
+                saveHistory()
+            }
+            currentWeek = freshWeek
+            saveWeekData()
+        }
+    }
+    
+    func updateHistory(_ newHistory: [WeekData]) {
+        self.history = newHistory
+        saveHistory()
+    }
+    
+    private func saveWeekData() {
+        if let data = try? JSONEncoder().encode(currentWeek) {
+            UserDefaults.standard.set(data, forKey: weekKey)
+        }
+    }
+    
+    private func saveHistory() {
+        if let data = try? JSONEncoder().encode(history) {
+            UserDefaults.standard.set(data, forKey: historyKey)
+        }
     }
     
     func refreshNotifications() {
@@ -78,12 +123,9 @@ class ZenStore: ObservableObject {
         return currentWeek.clips.first(where: { $0.dayIndex == dayIndex })
     }
     
-    // Helper to get today's index (0-6, Mon-Sun)
     var todayIndex: Int {
         let calendar = Calendar.current
-        // weekday: 1=Sun, 2=Mon... 7=Sat
         let weekday = calendar.component(.weekday, from: Date())
-        // Convert to 0=Mon, ... 6=Sun
         return (weekday + 5) % 7
     }
     
@@ -91,14 +133,27 @@ class ZenStore: ObservableObject {
         return dayIndex == todayIndex
     }
     
-    // Core Action Logic using React Native app rules
     func handleDayPress(dayIndex: Int) {
         if getClip(for: dayIndex) != nil {
-            // View existing clip
             path.append(.preview(dayIndex: dayIndex))
         } else if isToday(dayIndex: dayIndex) {
-            // Only allow capturing for TODAY
             path.append(.breathe(dayIndex: dayIndex))
         }
+    }
+    
+    static func createNewWeek() -> WeekData {
+        let now = Date()
+        let calendar = Calendar.current
+        let weekNumber = calendar.component(.weekOfYear, from: now)
+        let year = calendar.component(.yearForWeekOfYear, from: now)
+        let weekId = "\(year)-W\(String(format: "%02d", weekNumber))"
+        
+        return WeekData(
+            weekId: weekId,
+            startDate: now.ISO8601Format(),
+            clips: [],
+            isComplete: false,
+            generatedVideoUri: nil
+        )
     }
 }

@@ -60,6 +60,28 @@ class NotificationManager {
             scheduleDaily(for: date, hour: 9, title: "Morning Zen 🌿", body: "Good morning. Take a moment to capture the quiet.")
             scheduleDaily(for: date, hour: 17, title: "Evening Reflection 🌅", body: "The sun is setting. Have you captured your moment today?")
         }
+        
+        // 3. Schedule Monday 9 AM recap if not yet Monday or if we want it every week
+        scheduleMondayRecap()
+    }
+    
+    private func scheduleMondayRecap() {
+        let calendar = Calendar.current
+        var components = DateComponents()
+        components.weekday = 2 // Monday
+        components.hour = 9
+        components.minute = 0
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+        
+        let content = UNMutableNotificationContent()
+        content.title = "Last week is in Bloom 🌸"
+        content.body = "Relive last week's Zen and capture your first moment of this week!"
+        content.sound = .default
+        content.userInfo = ["navigate_to": "history"]
+        
+        let request = UNNotificationRequest(identifier: "zen_monday_recap", content: content, trigger: trigger)
+        UNUserNotificationCenter.current().add(request)
     }
     
     private func scheduleDaily(for date: Date, hour: Int, title: String, body: String) {

@@ -49,37 +49,37 @@ struct HomeView: View {
                                 }
                             }
                             
-                            // Week info & Progress
-                            VStack(spacing: 16) {
-                                Text("Week 2 · Jan 8-14")
-                                    .font(.system(size: 13))
-                                    .foregroundColor(Theme.Colors.textSecondary)
-                                    .tracking(0.5)
-                                
-                                // Progress Bar
-                                VStack(spacing: 8) {
-                                    GeometryReader { geo in
-                                        ZStack(alignment: .leading) {
-                                            Capsule()
-                                                .fill(Theme.Colors.surface)
-                                            
-                                            let count = store.currentWeek.clips.count
-                                            let width = count == 0 ? 0 : geo.size.width * (CGFloat(count) / 7.0)
-                                            
-                                            Capsule()
-                                                .fill(Theme.Colors.sage)
-                                                .frame(width: max(0, width))
-                                                .animation(.spring(), value: count)
-                                        }
+                        // Week info & Progress
+                        VStack(spacing: 16) {
+                            Text("Week \(store.currentWeek.weekId.suffix(2)) · \(formatDateRange(store.currentWeek.startDate))")
+                                .font(.system(size: 13))
+                                .foregroundColor(Theme.Colors.textSecondary)
+                                .tracking(0.5)
+                            
+                            // Progress Bar
+                            VStack(spacing: 8) {
+                                GeometryReader { geo in
+                                    ZStack(alignment: .leading) {
+                                        Capsule()
+                                            .fill(Theme.Colors.surface)
+                                        
+                                        let count = store.currentWeek.clips.count
+                                        let width = count == 0 ? 0 : geo.size.width * (CGFloat(count) / 7.0)
+                                        
+                                        Capsule()
+                                            .fill(Theme.Colors.sage)
+                                            .frame(width: max(0, width))
+                                            .animation(.spring(), value: count)
                                     }
-                                    .frame(height: 4)
-                                    .frame(maxWidth: 200) // Small progress bar
-                                    
-                                    Text("\(store.currentWeek.clips.count) of 7 moments captured")
-                                        .font(.caption)
-                                        .foregroundColor(Theme.Colors.textMuted)
                                 }
+                                .frame(height: 4)
+                                .frame(maxWidth: 200) // Small progress bar
+                                
+                                Text("\(store.currentWeek.clips.count) of 7 moments captured")
+                                    .font(.caption)
+                                    .foregroundColor(Theme.Colors.textMuted)
                             }
+                        }
                             
                             Spacer().frame(height: 20)
                             
@@ -102,7 +102,8 @@ struct HomeView: View {
                             }
                             
                             // 2. Generate Weekly Zen Button
-                            if store.currentWeek.clips.count >= 7 {
+                            // Only available after Sunday's clip (index 6)
+                            if store.getClip(for: 6) != nil {
                                 let isGenerated = store.currentWeek.generatedVideoUri != nil
                                 
                                 Button(action: {
@@ -118,7 +119,7 @@ struct HomeView: View {
                                                 .progressViewStyle(CircularProgressViewStyle(tint: .white))
                                         } else {
                                             Image(systemName: isGenerated ? "play.circle.fill" : "film")
-                                            Text(isGenerated ? "Watch Week 2 Zen" : "Generate Weekly Zen")
+                                            Text(isGenerated ? "Watch Week \(store.currentWeek.weekId.suffix(2)) Zen" : "Generate Weekly Zen")
                                         }
                                     }
                                     .font(.system(size: 16, weight: .bold))
@@ -139,41 +140,47 @@ struct HomeView: View {
                         Spacer()
                         
                         // History Section
-                        if let _ = store.currentWeek.generatedVideoUri {
+                        if !store.history.isEmpty {
                              VStack(alignment: .leading, spacing: 16) {
                                  Text("History")
                                      .font(.headline)
                                      .foregroundColor(Theme.Colors.textSecondary)
                                      .padding(.leading)
                                  
-                                 Button(action: {
-                                     store.path.append(.history)
-                                 }) {
-                                     HStack {
-                                         VStack(alignment: .leading, spacing: 4) {
-                                             Text("Week 2 · Jan 2026")
-                                                 .font(.system(size: 16, weight: .medium))
-                                                 .foregroundColor(Theme.Colors.cream)
-                                             Text("7 clips")
-                                                 .font(.caption)
-                                                 .foregroundColor(Theme.Colors.sage)
+                                 ForEach(store.history, id: \.weekId) { week in
+                                     Button(action: {
+                                         if let uri = week.generatedVideoUri, let url = URL(string: uri) {
+                                             store.path.append(.generatedVideo(url: url))
                                          }
-                                         Spacer()
-                                         Image(systemName: "chevron.right")
-                                             .foregroundColor(Theme.Colors.textMuted)
+                                     }) {
+                                         HStack {
+                                             VStack(alignment: .leading, spacing: 4) {
+                                                 Text("Week \(week.weekId.suffix(2)) · \(formatDateShort(week.startDate))")
+                                                     .font(.system(size: 16, weight: .medium))
+                                                     .foregroundColor(Theme.Colors.cream)
+                                                 Text("\(week.clips.count) clips")
+                                                     .font(.caption)
+                                                     .foregroundColor(Theme.Colors.sage)
+                                             }
+                                             Spacer()
+                                             if week.generatedVideoUri != nil {
+                                                 Image(systemName: "chevron.right")
+                                                     .foregroundColor(Theme.Colors.textMuted)
+                                             } else {
+                                                 // Indicates background generation might be pending or failed
+                                                 Text("Processing...")
+                                                     .font(.caption2)
+                                                     .foregroundColor(Theme.Colors.textMuted)
+                                             }
+                                         }
+                                         .padding()
+                                         .background(Theme.Colors.surface)
+                                         .cornerRadius(12)
+                                         .padding(.horizontal)
                                      }
-                                     .padding()
-                                     .background(Theme.Colors.surface)
-                                     .cornerRadius(12)
-                                     .padding(.horizontal)
                                  }
                              }
                              .padding(.bottom, 20)
-                        } else {
-                            // Old History Button (Hidden if we have the list above, or keep it?)
-                            // User asked for "full width row".
-                            // Let's keep the history list simpler.
-                            EmptyView()
                         }
                     }
                     .padding(.bottom, 20)
@@ -254,6 +261,37 @@ struct HomeView: View {
             }
         }
     }
+
+    func formatDateShort(_ isoString: String) -> String {
+        let formatter = ISO8601DateFormatter()
+        if let date = formatter.date(from: isoString) {
+            let df = DateFormatter()
+            df.dateFormat = "MMM yyyy"
+            return df.string(from: date)
+        }
+        return isoString
+    }
+    
+    func formatDateRange(_ isoString: String) -> String {
+        let formatter = ISO8601DateFormatter()
+        if let date = formatter.date(from: isoString) {
+            let calendar = Calendar.current
+            let weekFields = calendar.dateInterval(of: .weekOfYear, for: date)
+            let start = weekFields?.start ?? date
+            let end = weekFields?.end ?? date
+            
+            let df = DateFormatter()
+            df.dateFormat = "MMM d"
+            let startStr = df.string(from: start)
+            
+            let dfEnd = DateFormatter()
+            dfEnd.dateFormat = "d"
+            let endStr = dfEnd.string(from: calendar.date(byAdding: .day, value: -1, to: end) ?? end)
+            
+            return "\(startStr)-\(endStr)"
+        }
+        return "New Week"
+    }
 }
 
 struct GeneratedVideoView: View {
@@ -286,7 +324,7 @@ struct GeneratedVideoView: View {
                             .clipShape(Circle())
                     }
                     Spacer()
-                    Text("Week 2 Zen")
+                    Text("Weekly Zen")
                         .font(.headline)
                         .foregroundColor(Theme.Colors.cream)
                     Spacer()
