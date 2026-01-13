@@ -28,6 +28,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Ensure V2/V3 signing for 16KB alignment support
+            signingConfig = signingConfigs.getByName("debug") // User will replace with release key
         }
     }
 
@@ -97,8 +99,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // FFmpegKit (16KB page-aligned AAR for Android 15+ support)
-    // Download from: https://github.com/AliAkhgar/ffmpeg-kit-16KB
-    // Place in app/libs/ffmpeg-kit-full-gpl-6.0-2.aar
+    // Using: ffmpeg-kit-main-ndk-r25-16k.aar
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar"))))
     implementation("com.arthenica:smart-exception-java:0.2.1")
 

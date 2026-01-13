@@ -45,7 +45,7 @@ No filters, no social pressure, no distractions. Just you, your breath, and the 
 ## 🖼️ Store Assets (Android)
 
 *   **App Icon**: `store_assets/app_icon_512.png`
-*   **Feature Graphic**: `store_assets/android_feature_graphic.png` (1024x500)
+*   **Feature Graphic**: `store_assets/branding/android_feature_graphic.png` (1024x500 - Play Store Compliant)
 *   **Screenshots**: 
     - `store_assets/01_Splash.png`
     - `store_assets/02_Weekly_Zen.png`
