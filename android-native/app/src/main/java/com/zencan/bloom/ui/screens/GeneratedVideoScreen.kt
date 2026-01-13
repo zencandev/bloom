@@ -39,12 +39,23 @@ import java.io.FileInputStream
 
 @Composable
 fun GeneratedVideoScreen(
+    weekId: String? = null,
     zenStore: ZenStore,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val weekData by zenStore.currentWeek.collectAsState()
+    
+    val currentWeek by zenStore.currentWeek.collectAsState()
+    val history by zenStore.history.collectAsState()
+    
+    val weekData = remember(weekId, currentWeek, history) {
+        if (weekId == null || weekId == currentWeek.weekId) {
+            currentWeek
+        } else {
+            history.find { it.weekId == weekId } ?: currentWeek
+        }
+    }
     
     var isSaving by remember { mutableStateOf(false) }
     var isGenerating by remember { mutableStateOf(false) }
@@ -59,7 +70,7 @@ fun GeneratedVideoScreen(
     }
     
     // Trigger video generation if not already generated
-    LaunchedEffect(weekData.clips.size, videoUri) {
+    LaunchedEffect(weekData.weekId, videoUri) {
         if (videoUri == null && weekData.clips.isNotEmpty() && !isGenerating) {
             isGenerating = true
             generationError = null
@@ -74,7 +85,7 @@ fun GeneratedVideoScreen(
             
             when (result) {
                 is VideoStitcher.Result.Success -> {
-                    zenStore.setGeneratedVideo(result.outputPath)
+                    zenStore.setGeneratedVideoForWeek(weekData.weekId, result.outputPath)
                 }
                 is VideoStitcher.Result.Error -> {
                     generationError = result.message

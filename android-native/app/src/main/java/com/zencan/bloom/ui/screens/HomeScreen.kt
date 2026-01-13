@@ -28,7 +28,7 @@ fun HomeScreen(
     zenStore: ZenStore,
     onNavigateToBreathe: (Int) -> Unit,
     onNavigateToPreview: (Int) -> Unit,
-    onNavigateToGeneratedVideo: () -> Unit
+    onNavigateToGeneratedVideo: (String?) -> Unit
 ) {
     val weekData by zenStore.currentWeek.collectAsState()
     val history by zenStore.history.collectAsState()
@@ -82,7 +82,7 @@ fun HomeScreen(
         
         // Week Info & Progress
         Text(
-            text = "Week 2 · Jan 8-14",
+            text = "Week ${weekData.weekId.substringAfter("-W")} · ${zenStore.currentWeekRange()}",
             fontSize = 13.sp,
             color = BloomColors.TextSecondary,
             letterSpacing = 0.5.sp
@@ -116,7 +116,7 @@ fun HomeScreen(
             val isGenerated = weekData.generatedVideoUri != null
             
             Button(
-                onClick = { onNavigateToGeneratedVideo() },
+                onClick = { onNavigateToGeneratedVideo(weekData.weekId) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
@@ -132,7 +132,7 @@ fun HomeScreen(
                 )
             ) {
                 Text(
-                    text = if (isGenerated) "Watch Week 2 Zen" else "Generate Weekly Zen",
+                    text = if (isGenerated) "Watch Week ${weekData.weekId.substringAfter("-W")} Zen" else "Generate Weekly Zen",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black.copy(alpha = 0.8f)
@@ -306,7 +306,7 @@ private fun ProgressSection(clipCount: Int) {
 @Composable
 private fun HistorySection(
     history: List<WeekData>,
-    onNavigateToGeneratedVideo: () -> Unit
+    onNavigateToGeneratedVideo: (String?) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -328,11 +328,8 @@ private fun HistorySection(
                     .fillMaxWidth()
                     .padding(bottom = 12.dp)
                     .clickable { 
-                        if (week.generatedVideoUri != null) {
-                            onNavigateToGeneratedVideo() 
-                        }
+                        onNavigateToGeneratedVideo(week.weekId)
                     },
-                shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(containerColor = BloomColors.Surface)
             ) {
                 Row(

@@ -38,9 +38,9 @@ No filters, no social pressure, no distractions. Just you, your breath, and the 
 
 ## 🚀 Release Versioning
 
-*   **Version**: 1.0.0
-*   **Version Code**: 1
-*   **Release Notes**: Initial release of Bloom! Start capturing your daily moments and reliving them through cinematic weekly recaps.
+*   **Version**: 1.1.0
+*   **Version Code**: 2
+*   **Release Notes**: This update fixes a critical issue where historical "Weekly Zen" videos were not generating correctly. We've also improved week range labeling and polished the playback experience.
 
 ## 🖼️ Store Assets (Android)
 

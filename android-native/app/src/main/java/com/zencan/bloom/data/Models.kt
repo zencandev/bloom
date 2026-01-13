@@ -41,7 +41,12 @@ sealed class Route(val route: String) {
             fun createRoute(dayIndex: Int) = "preview/$dayIndex"
         }
     }
-    data object GeneratedVideo : Route("generated_video")
+    data class GeneratedVideo(val weekId: String? = null) : Route("generated_video?weekId={weekId}") {
+        companion object {
+            const val ROUTE = "generated_video?weekId={weekId}"
+            fun createRoute(weekId: String? = null) = if (weekId != null) "generated_video?weekId=$weekId" else "generated_video"
+        }
+    }
     data object History : Route("history")
 }
 

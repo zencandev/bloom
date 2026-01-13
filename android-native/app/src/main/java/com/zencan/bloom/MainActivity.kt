@@ -105,7 +105,7 @@ fun BloomNavigation(zenStore: ZenStore, navigateTo: String? = null) {
     // Handle deep-link navigation
     LaunchedEffect(isInitialized, navigateTo) {
         if (isInitialized && navigateTo == "history") {
-            navController.navigate(Route.GeneratedVideo.route)
+            navController.navigate(Route.GeneratedVideo.createRoute())
         }
     }
     
@@ -137,8 +137,8 @@ fun BloomNavigation(zenStore: ZenStore, navigateTo: String? = null) {
                 onNavigateToPreview = { dayIndex ->
                     navController.navigate(Route.Preview.createRoute(dayIndex))
                 },
-                onNavigateToGeneratedVideo = {
-                    navController.navigate(Route.GeneratedVideo.route)
+                onNavigateToGeneratedVideo = { weekId ->
+                    navController.navigate(Route.GeneratedVideo.createRoute(weekId))
                 }
             )
         }
@@ -187,8 +187,17 @@ fun BloomNavigation(zenStore: ZenStore, navigateTo: String? = null) {
             )
         }
         
-        composable(Route.GeneratedVideo.route) {
+        composable(
+            route = Route.GeneratedVideo.ROUTE,
+            arguments = listOf(navArgument("weekId") { 
+                type = NavType.StringType
+                nullable = true
+                defaultValue = null
+            })
+        ) { backStackEntry ->
+            val weekId = backStackEntry.arguments?.getString("weekId")
             GeneratedVideoScreen(
+                weekId = weekId,
                 zenStore = zenStore,
                 onBack = { navController.popBackStack() }
             )

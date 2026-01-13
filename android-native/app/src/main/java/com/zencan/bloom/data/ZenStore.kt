@@ -143,6 +143,18 @@ class ZenStore(private val context: Context) {
     suspend fun setGeneratedVideo(uri: String) {
         setGeneratedVideoUri(uri)
     }
+
+    suspend fun setGeneratedVideoForWeek(weekId: String, uri: String) {
+        if (weekId == _currentWeek.value.weekId) {
+            setGeneratedVideoUri(uri)
+        } else {
+            val updatedHistory = _history.value.map {
+                if (it.weekId == weekId) it.copy(generatedVideoUri = uri) else it
+            }
+            _history.value = updatedHistory
+            saveHistory()
+        }
+    }
     
     private suspend fun saveWeekData() {
         context.dataStore.edit { prefs ->
@@ -165,6 +177,18 @@ class ZenStore(private val context: Context) {
     
     fun hasClipForToday(): Boolean {
         return getClip(todayIndex) != null
+    }
+
+    fun currentWeekRange(): String {
+        val now = LocalDate.now()
+        val weekFields = WeekFields.of(Locale.getDefault())
+        val firstDayOfWeek = now.with(weekFields.dayOfWeek(), 1L)
+        val lastDayOfWeek = now.with(weekFields.dayOfWeek(), 7L)
+        
+        val df = DateTimeFormatter.ofPattern("MMM d", Locale.getDefault())
+        val dfDay = DateTimeFormatter.ofPattern("d", Locale.getDefault())
+        
+        return "${firstDayOfWeek.format(df)}-${lastDayOfWeek.format(dfDay)}"
     }
 
     private fun createNewWeek(): WeekData {
