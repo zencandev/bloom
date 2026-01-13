@@ -240,8 +240,8 @@ class NotificationReceiver : BroadcastReceiver() {
         
         val notification = NotificationCompat.Builder(context, com.zensnap.bloom.BloomApp.NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_camera)
-            .setContentTitle("Your Weekly Zen is ready 🎬")
-            .setContentText("Watch your moments from last week.")
+            .setContentTitle("Last week is in Bloom 🌸")
+            .setContentText("Relive last week's Zen and capture your first moment of this week!")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
