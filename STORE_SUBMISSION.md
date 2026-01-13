@@ -10,7 +10,7 @@
 | **Category** | Health & Fitness / Lifestyle |
 | **Keywords** | mindfulness, gratitude, video journal, slow motion, zen, daily habit, reflection |
 | **Primary Language** | English (US) |
-| **Target Age Group**| 18 and over (Recommended to avoid Families Policy) |
+| **Target Age Group**| 13 and over |
 
 ## ✍️ Descriptions
 
